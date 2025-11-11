@@ -14,6 +14,7 @@ class UserService:
 
     def create_user(self, db: Session, user: schemas.UserCreate):
         db_user = models.User(email=user.email, name=user.name)
+        
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
