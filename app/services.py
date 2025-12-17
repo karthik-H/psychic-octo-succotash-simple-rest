@@ -22,7 +22,6 @@ class UserService:
     def update_user(self, db: Session, user_id: int, user: schemas.UserCreate):
         db_user = self.get_user(db, user_id)
         if db_user:
-            db_user.email = user.email
             db_user.name = user.name
             db.commit()
             db.refresh(db_user)
