@@ -11,5 +11,3 @@ An application that manages user accounts and provides statistical analysis.
 - Categorize users into age groups (youth: 0-17, adult: 18-64, senior: 65+)
 - Prevent duplicate usernames
 - Validate age range (0-150)
-
-The system should maintain a collection of users, allow modifications to user data, and provide accurate statistics on active users only.  
