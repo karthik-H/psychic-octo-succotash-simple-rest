@@ -12,4 +12,4 @@ An application that manages user accounts and provides statistical analysis.
 - Prevent duplicate usernames
 - Validate age range (0-150)
 
-The system should maintain a collection of users, allow modifications to user data, and provide accurate statistics on active users only. 
+The system should maintain a collection of users, allow modifications to user data, and provide accurate statistics on active users only.  
