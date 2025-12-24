@@ -1,6 +1,7 @@
 {
   "breakdowns": [
     {
+      "id": "add_new_user",
       "header": "Add New User",
       "description": "Add new users with username, email, and age.",
       "conditions": [
@@ -9,16 +10,19 @@
       ]
     },
     {
+      "id": "update_email_address",
       "header": "Update User Email Address",
       "description": "Update user email addresses.",
       "conditions": []
     },
     {
+      "id": "deactivate_user_account",
       "header": "Deactivate User Account",
       "description": "Deactivate user accounts.",
       "conditions": []
     },
     {
+      "id": "calculate_average_age",
       "header": "Calculate Average Age of Active Users",
       "description": "Calculate average age of active users.",
       "conditions": [
@@ -26,6 +30,7 @@
       ]
     },
     {
+      "id": "categorize_user_into_age",
       "header": "Categorize Users into Age Groups",
       "description": "Categorize users into age groups: youth (0-17), adult (18-64), senior (65+).",
       "conditions": [
