@@ -4,25 +4,26 @@
       {
         "function_name": "create_user",
         "file_path": "app/routers/users.py",
-        "How_is_it_connected_to_implementation": "API endpoint handler for adding a new user. Receives user data, checks for duplicate email, and calls the service layer to create the user.",
-        "pseudo_code": "If a user with the given email exists, raise an error. Otherwise, call the service to create the user."
+        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and calls the service layer to create the user.",
+        "pseudo_code": "def create_user(user, db):\n    db_user = get_user_by_email(db, user.email)\n    if db_user:\n        raise HTTPException('Email already registered')\n    return create_user(db, user)"
       },
       {
         "function_name": "get_user_by_email",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before adding a new user.",
-        "pseudo_code": "Query the database for a user with the given email. Return the user if found, else return None."
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database to prevent duplicates.",
+        "pseudo_code": "def get_user_by_email(db, email):\n    return db.query(User).filter(User.email == email).first()"
       },
       {
         "function_name": "create_user",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Creates and persists a new user in the database with the provided email and name.",
-        "pseudo_code": "Create a new User model instance with the provided email and name. Add to the database, commit, refresh, and return the user."
+        "How_is_it_connected_to_implementation": "Creates and saves a new user in the database using the provided email and name.",
+        "pseudo_code": "def create_user(db, user):\n    db_user = User(email=user.email, name=user.name)\n    db.add(db_user)\n    db.commit()\n    db.refresh(db_user)\n    return db_user"
       }
     ],
     "missing_implementations": [
       "Username must not be duplicate",
-      "Age must be in the range 0-150"
+      "Age must be in the range 0-150",
+      "Add new users with work_role"
     ]
   },
   "update_email_address": {
