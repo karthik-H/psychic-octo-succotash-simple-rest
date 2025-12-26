@@ -3,12 +3,12 @@
     {
       "id": "add_new_user",
       "header": "Add New User",
-      "description": "Add new users with username, email, and age.",
+      "description": "Add new users with username, email, age, and work_role.",
       "conditions": [
         "Username must not be duplicate",
         "Age must be in the range 0-150"
       ],
-      "change_status": ""
+      "change_status": "updated"
     },
     {
       "id": "update_email_address",
@@ -45,6 +45,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-26T22:55:48.730695",
+  "last_updated": "2025-12-26T23:18:05.171831",
   "version": "1.0"
 }
