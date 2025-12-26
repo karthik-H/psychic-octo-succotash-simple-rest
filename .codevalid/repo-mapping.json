@@ -1,0 +1,28 @@
+{
+  "add_new_user": {
+    "implementation": [
+      {
+        "function_name": "create_user",
+        "file_path": "app/routers/users.py",
+        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and delegates user creation to the service layer.",
+        "pseudo_code": "def create_user(user, db):\n    db_user = get_user_by_email(db, user.email)\n    if db_user:\n        raise HTTPException('Email already registered')\n    return user_service.create_user(db, user)"
+      },
+      {
+        "function_name": "get_user_by_email",
+        "file_path": "app/services.py",
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database to enforce uniqueness.",
+        "pseudo_code": "def get_user_by_email(db, email):\n    return db.query(User).filter(User.email == email).first()"
+      },
+      {
+        "function_name": "create_user",
+        "file_path": "app/services.py",
+        "How_is_it_connected_to_implementation": "Handles the actual creation and insertion of the new user into the database.",
+        "pseudo_code": "def create_user(db, user):\n    db_user = User(email=user.email, name=user.name)\n    db.add(db_user)\n    db.commit()\n    db.refresh(db_user)\n    return db_user"
+      }
+    ],
+    "missing_implementations": [
+      "Username must not be duplicate",
+      "Age must be in the range 0-150"
+    ]
+  }
+}
