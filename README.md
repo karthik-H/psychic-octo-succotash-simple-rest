@@ -4,7 +4,7 @@
 An application that manages user accounts and provides statistical analysis.
 
 ## Features:
-- Add new users with username, email, and age
+- Add new users with username, email, and age, work_role
 - Update user email addresses
 - Deactivate user accounts
 - Calculate average age of active users
