@@ -6,6 +6,7 @@ An application that manages user accounts and provides statistical analysis.
 ## Features:
 - Add new users with username, email, and age, work_role
 - Update user email addresses
+- default work_role to developer
 - don't update if the previous email is same as updated one
 - Deactivate user accounts
 - send email of deactivation to the email address
