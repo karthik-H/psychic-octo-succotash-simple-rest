@@ -9,7 +9,7 @@
         "Age must be in the range 0-150",
         "If work_role is not provided, default to developer"
       ],
-      "change_status": "updated"
+      "change_status": ""
     },
     {
       "id": "update_email_address",
@@ -18,14 +18,16 @@
       "conditions": [
         "Do not update if the previous email is the same as the updated one"
       ],
-      "change_status": "updated"
+      "change_status": ""
     },
     {
       "id": "deactivate_user_account",
       "header": "Deactivate User Account",
-      "description": "Deactivate user accounts.",
-      "conditions": [],
-      "change_status": ""
+      "description": "Deactivate user accounts and send an email of deactivation to the user's email address.",
+      "conditions": [
+        "Send email of deactivation to the email address"
+      ],
+      "change_status": "updated"
     },
     {
       "id": "calculate_average_age",
@@ -48,6 +50,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-27T00:00:00.383633",
+  "last_updated": "2025-12-27T01:00:59.360124",
   "version": "1.0"
 }
