@@ -27,7 +27,7 @@
       "conditions": [
         "Send email of deactivation to the email address"
       ],
-      "change_status": "updated"
+      "change_status": ""
     },
     {
       "id": "calculate_average_age",
@@ -50,6 +50,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-27T01:00:59.360124",
+  "last_updated": "2025-12-27T04:37:07.547447",
   "version": "1.0"
 }
