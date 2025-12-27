@@ -5,25 +5,25 @@
         "function_name": "create_user",
         "file_path": "app/routers/users.py",
         "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and calls the service layer to create the user.",
-        "pseudo_code": "def create_user(user, db):\n    db_user = get_user_by_email(db, user.email)\n    if db_user:\n        raise HTTPException('Email already registered')\n    return create_user(db, user)"
+        "pseudo_code": "If a user with the given email exists, raise HTTP 400. Otherwise, call the service to create the user and return the result."
       },
       {
         "function_name": "get_user_by_email",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database to prevent duplicates.",
-        "pseudo_code": "def get_user_by_email(db, email):\n    return db.query(User).filter(User.email == email).first()"
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before creating a new user.",
+        "pseudo_code": "Query the database for a user with the given email. Return the user if found, else return None."
       },
       {
         "function_name": "create_user",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Creates and saves a new user in the database using the provided email and name.",
-        "pseudo_code": "def create_user(db, user):\n    db_user = User(email=user.email, name=user.name)\n    db.add(db_user)\n    db.commit()\n    db.refresh(db_user)\n    return db_user"
+        "How_is_it_connected_to_implementation": "Handles the actual creation of the user in the database. Adds the user and commits the transaction.",
+        "pseudo_code": "Create a new User model instance with the provided email and name. Add to the database session, commit, refresh, and return the user."
       }
     ],
     "missing_implementations": [
       "Username must not be duplicate",
       "Age must be in the range 0-150",
-      "Add new users with work_role"
+      "If work_role is not provided, default to developer"
     ]
   },
   "update_email_address": {
@@ -31,17 +31,19 @@
       {
         "function_name": "update_user",
         "file_path": "app/routers/users.py",
-        "How_is_it_connected_to_implementation": "This is the FastAPI route handler for updating a user's information, including their email address. It receives the HTTP PUT request, extracts the user_id and new user data, and delegates the update operation to the service layer.",
-        "pseudo_code": "Receive PUT request with user_id and new user data; Call services.user_service.update_user with db, user_id, and user; If user not found, raise 404; Return updated user."
+        "How_is_it_connected_to_implementation": "This is the FastAPI route handler for updating a user's information, including their email address. It receives the HTTP PUT request, calls the service layer to perform the update, and returns the updated user or an error if not found.",
+        "pseudo_code": "On PUT /users/{user_id}, call services.user_service.update_user(db, user_id, user). If the user is not found, raise a 404 error. Otherwise, return the updated user."
       },
       {
-        "function_name": "UserService.update_user",
+        "function_name": "update_user",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "This service function performs the actual update of the user's email address in the database. It fetches the user by ID, updates the email and name fields, commits the transaction, and returns the updated user.",
-        "pseudo_code": "Fetch user by user_id; If user exists: set db_user.email = user.email; set db_user.name = user.name; commit changes; refresh user; Return updated user."
+        "How_is_it_connected_to_implementation": "This service function performs the actual update of the user's email address in the database. It is called by the API router and handles fetching the user, updating the email and name, committing the transaction, and returning the updated user.",
+        "pseudo_code": "Fetch user by user_id. If user exists, set db_user.email = user.email and db_user.name = user.name, commit, refresh, and return db_user. If user does not exist, return None."
       }
     ],
-    "missing_implementations": []
+    "missing_implementations": [
+      "Do not update if the previous email is the same as the updated one"
+    ]
   },
   "deactivate_user_account": {
     "implementation": [
