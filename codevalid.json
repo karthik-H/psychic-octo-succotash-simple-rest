@@ -6,8 +6,7 @@
       "description": "Add new users with username, email, age, and work_role.",
       "conditions": [
         "Username must not be duplicate",
-        "Age must be in the range 0-150",
-        "Default work_role to developer if not specified"
+        "Age must be in the range 0-150"
       ],
       "change_status": "updated"
     },
@@ -50,6 +49,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-27T16:57:07.019663",
+  "last_updated": "2025-12-27T17:30:16.878839",
   "version": "1.0"
 }
