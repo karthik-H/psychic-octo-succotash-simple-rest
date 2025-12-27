@@ -3,10 +3,11 @@
     {
       "id": "add_new_user",
       "header": "Add New User",
-      "description": "Add new users with username, email, age, and work_role.",
+      "description": "Add new users with username, email, age, and work_role. The work_role defaults to developer if not specified.",
       "conditions": [
         "Username must not be duplicate",
-        "Age must be in the range 0-150"
+        "Age must be in the range 0-150",
+        "If work_role is not provided, default to developer"
       ],
       "change_status": "updated"
     },
@@ -14,8 +15,10 @@
       "id": "update_email_address",
       "header": "Update User Email Address",
       "description": "Update user email addresses.",
-      "conditions": [],
-      "change_status": ""
+      "conditions": [
+        "Do not update if the previous email is the same as the updated one"
+      ],
+      "change_status": "updated"
     },
     {
       "id": "deactivate_user_account",
@@ -45,6 +48,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-26T23:18:05.171831",
+  "last_updated": "2025-12-27T00:00:00.383633",
   "version": "1.0"
 }
