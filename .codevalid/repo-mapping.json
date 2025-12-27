@@ -3,8 +3,7 @@
     "implementation": [],
     "missing_implementations": [
       "Username must not be duplicate",
-      "Age must be in the range 0-150",
-      "If work_role is not provided, default to developer"
+      "Age must be in the range 0-150"
     ]
   },
   "update_email_address": {
