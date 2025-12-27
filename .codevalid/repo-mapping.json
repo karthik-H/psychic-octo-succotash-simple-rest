@@ -5,22 +5,22 @@
         "name": "create_user",
         "file_path": "app/routers/users.py",
         "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and delegates creation to the service layer.",
-        "pseudo_code": "def create_user(user, db):\n    db_user = get_user_by_email(db, email=user.email)\n    if db_user:\n        raise HTTPException('Email already registered')\n    return create_user(db=db, user=user)"
+        "How_is_it_connected_to_implementation": "API endpoint for POST /users/. Receives user data, checks for duplicate email, and delegates user creation to the service layer.",
+        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if the email is already registered\n    IF a user with the email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call UserService.create_user to add the user\n        Return the created user"
       },
       {
         "name": "get_user_by_email",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists to prevent duplicates.",
-        "pseudo_code": "def get_user_by_email(db, email):\n    return db.query(User).filter(User.email == email).first()"
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before creating a new user.",
+        "pseudo_code": "Query the User table for a user with the given email\nReturn the user if found, else return None"
       },
       {
         "name": "create_user",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Creates and saves a new user in the database using the provided user data.",
-        "pseudo_code": "def create_user(db, user):\n    db_user = User(email=user.email, name=user.name)\n    db.add(db_user)\n    db.commit()\n    db.refresh(db_user)\n    return db_user"
+        "How_is_it_connected_to_implementation": "Creates a new user in the database using the provided user data. Called by the endpoint after duplicate email check.",
+        "pseudo_code": "Create a new User model instance with email and name from the input\nAdd the user to the database session\nCommit the session to save the user\nRefresh and return the created user"
       }
     ],
     "missing_implementations": [
@@ -36,21 +36,14 @@
         "file_path": "app/routers/users.py",
         "type": "endpoint",
         "How_is_it_connected_to_implementation": "API endpoint that handles HTTP PUT requests to update a user's information, including their email address. It delegates the update logic to the service layer.",
-        "pseudo_code": "def update_user(user_id, user, db):\n    db_user = services.user_service.update_user(db, user_id=user_id, user=user)\n    if db_user is None:\n        raise HTTPException(status_code=404, detail=\"User not found\")\n    return db_user"
+        "pseudo_code": "When a PUT request is made to /users/{user_id} with new user data:\n    Call services.user_service.update_user with db, user_id, and user\n    If the returned db_user is None:\n        Raise HTTP 404 (User not found)\n    Return the updated user"
       },
       {
         "name": "UserService.update_user",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Service function called by the endpoint to perform the actual update of the user's email address in the database.",
-        "pseudo_code": "def update_user(db, user_id, user):\n    db_user = self.get_user(db, user_id)\n    if db_user:\n        db_user.email = user.email\n        db_user.name = user.name\n        db.commit()\n        db.refresh(db_user)\n    return db_user"
-      },
-      {
-        "name": "UserService.get_user",
-        "file_path": "app/services.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Helper function used by update_user to retrieve the user record from the database before updating.",
-        "pseudo_code": "def get_user(db, user_id):\n    return db.query(models.User).filter(models.User.id == user_id).first()"
+        "How_is_it_connected_to_implementation": "Service function called by the endpoint to perform the actual update of the user's email and name in the database.",
+        "pseudo_code": "Given db, user_id, and user:\n    Retrieve db_user by user_id\n    If db_user exists:\n        Set db_user.email to user.email\n        Set db_user.name to user.name\n        Commit changes to the database\n        Refresh db_user from the database\n    Return db_user"
       }
     ],
     "missing_implementations": [
@@ -63,15 +56,15 @@
         "name": "delete_user",
         "file_path": "app/routers/users.py",
         "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint that handles DELETE requests to /users/{user_id}. It initiates the user deactivation (deletion) process.",
-        "pseudo_code": "def delete_user(user_id: int, db: Session = Depends(get_db)):\n    db_user = services.user_service.delete_user(db, user_id=user_id)\n    if db_user is None:\n        raise HTTPException(status_code=404, detail=\"User not found\")\n    return db_user"
+        "How_is_it_connected_to_implementation": "API endpoint that handles HTTP DELETE requests to remove a user by user_id. It calls the service layer to perform the deletion.",
+        "pseudo_code": "When a DELETE request is made to /users/{user_id}:\n    Call services.user_service.delete_user(db, user_id)\n    If no user is found:\n        Raise HTTP 404 error\n    Return the deleted user object"
       },
       {
         "name": "UserService.delete_user",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Service function called by the endpoint to perform the actual deletion of the user from the database.",
-        "pseudo_code": "def delete_user(self, db: Session, user_id: int):\n    db_user = self.get_user(db, user_id)\n    if db_user:\n        db.delete(db_user)\n        db.commit()\n    return db_user"
+        "How_is_it_connected_to_implementation": "Service function that deletes the user from the database if found. Called by the delete_user endpoint.",
+        "pseudo_code": "Given db and user_id:\n    Retrieve user by user_id\n    If user exists:\n        Delete user from database\n        Commit transaction\n    Return the deleted user object (or None if not found)"
       }
     ],
     "missing_implementations": [
@@ -81,8 +74,7 @@
   "calculate_average_age": {
     "implementation": [],
     "missing_implementations": [
-      "Calculate average age of active users.",
-      "Only active users are considered"
+      "Calculate average age of active users"
     ]
   },
   "categorize_user_into_age": {
