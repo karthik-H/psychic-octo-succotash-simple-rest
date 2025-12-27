@@ -2,22 +2,53 @@
   "add_new_user": {
     "implementation": [
       {
-        "function_name": "create_user",
+        "name": "app.main.py:app",
+        "file_path": "app/main.py",
+        "type": "component",
+        "How_is_it_connected_to_implementation": "Initializes the FastAPI app and includes the users router, which exposes the user creation endpoint.",
+        "pseudo_code": "Create FastAPI app\nInclude users router\n"
+      },
+      {
+        "name": "users.router",
         "file_path": "app/routers/users.py",
-        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and calls the service layer to create the user.",
-        "pseudo_code": "If a user with the given email exists, raise HTTP 400. Otherwise, call the service to create the user and return the result."
+        "type": "component",
+        "How_is_it_connected_to_implementation": "Defines the API routes for user operations, including the POST /users/ endpoint for adding a new user.",
+        "pseudo_code": "Define APIRouter\nDefine POST /users/ endpoint (create_user)\n"
       },
       {
-        "function_name": "get_user_by_email",
-        "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before creating a new user.",
-        "pseudo_code": "Query the database for a user with the given email. Return the user if found, else return None."
+        "name": "create_user",
+        "file_path": "app/routers/users.py",
+        "type": "endpoint",
+        "How_is_it_connected_to_implementation": "API endpoint that receives user data, checks for duplicate email, and delegates user creation to the service layer.",
+        "pseudo_code": "def create_user(user, db):\n    db_user = user_service.get_user_by_email(db, email=user.email)\n    if db_user:\n        raise HTTPException('Email already registered')\n    return user_service.create_user(db=db, user=user)\n"
       },
       {
-        "function_name": "create_user",
+        "name": "UserService.get_user_by_email",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Handles the actual creation of the user in the database. Adds the user and commits the transaction.",
-        "pseudo_code": "Create a new User model instance with the provided email and name. Add to the database session, commit, refresh, and return the user."
+        "type": "function",
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database to prevent duplicates.",
+        "pseudo_code": "def get_user_by_email(db, email):\n    return db.query(User).filter(User.email == email).first()\n"
+      },
+      {
+        "name": "UserService.create_user",
+        "file_path": "app/services.py",
+        "type": "function",
+        "How_is_it_connected_to_implementation": "Creates and saves a new user in the database using the provided email and name.",
+        "pseudo_code": "def create_user(db, user):\n    db_user = User(email=user.email, name=user.name)\n    db.add(db_user)\n    db.commit()\n    db.refresh(db_user)\n    return db_user\n"
+      },
+      {
+        "name": "User",
+        "file_path": "app/models.py",
+        "type": "component",
+        "How_is_it_connected_to_implementation": "SQLAlchemy model representing the users table in the database.",
+        "pseudo_code": "class User(Base):\n    id = Column(Integer, primary_key=True, index=True)\n    email = Column(String, unique=True, index=True)\n    name = Column(String)\n"
+      },
+      {
+        "name": "UserCreate",
+        "file_path": "app/schemas.py",
+        "type": "component",
+        "How_is_it_connected_to_implementation": "Pydantic schema for validating incoming user creation data.",
+        "pseudo_code": "class UserCreate(UserBase):\n    pass\n"
       }
     ],
     "missing_implementations": [
@@ -29,16 +60,18 @@
   "update_email_address": {
     "implementation": [
       {
-        "function_name": "update_user",
+        "name": "update_user",
         "file_path": "app/routers/users.py",
-        "How_is_it_connected_to_implementation": "This is the FastAPI route handler for updating a user's information, including their email address. It receives the HTTP PUT request, calls the service layer to perform the update, and returns the updated user or an error if not found.",
-        "pseudo_code": "On PUT /users/{user_id}, call services.user_service.update_user(db, user_id, user). If the user is not found, raise a 404 error. Otherwise, return the updated user."
+        "type": "endpoint",
+        "How_is_it_connected_to_implementation": "API endpoint that handles HTTP PUT requests to update a user's information, including their email address. It calls the service layer to perform the update.",
+        "pseudo_code": "def update_user(user_id, user, db):\n    db_user = services.user_service.update_user(db, user_id=user_id, user=user)\n    if db_user is None:\n        raise HTTPException(status_code=404, detail=\"User not found\")\n    return db_user"
       },
       {
-        "function_name": "update_user",
+        "name": "UserService.update_user",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "This service function performs the actual update of the user's email address in the database. It is called by the API router and handles fetching the user, updating the email and name, committing the transaction, and returning the updated user.",
-        "pseudo_code": "Fetch user by user_id. If user exists, set db_user.email = user.email and db_user.name = user.name, commit, refresh, and return db_user. If user does not exist, return None."
+        "type": "function",
+        "How_is_it_connected_to_implementation": "Service function called by the endpoint to update the user's email and name in the database.",
+        "pseudo_code": "def update_user(db, user_id, user):\n    db_user = self.get_user(db, user_id)\n    if db_user:\n        db_user.email = user.email\n        db_user.name = user.name\n        db.commit()\n        db.refresh(db_user)\n    return db_user"
       }
     ],
     "missing_implementations": [
@@ -48,16 +81,18 @@
   "deactivate_user_account": {
     "implementation": [
       {
-        "function_name": "delete_user",
+        "name": "delete_user",
         "file_path": "app/routers/users.py",
-        "How_is_it_connected_to_implementation": "API endpoint for deleting (deactivating) a user account. It calls the service layer to perform the deletion and returns the deleted user object.",
-        "pseudo_code": "When a DELETE request is made to /users/{user_id}, call services.user_service.delete_user(db, user_id). If the user does not exist, raise a 404 error. Otherwise, return the deleted user."
+        "type": "endpoint",
+        "How_is_it_connected_to_implementation": "API endpoint that handles DELETE requests to /users/{user_id}. It calls the service layer to delete (deactivate) the user.",
+        "pseudo_code": "def delete_user(user_id: int, db: Session = Depends(get_db)):\n    db_user = services.user_service.delete_user(db, user_id=user_id)\n    if db_user is None:\n        raise HTTPException(status_code=404, detail=\"User not found\")\n    return db_user"
       },
       {
-        "function_name": "delete_user",
+        "name": "UserService.delete_user",
         "file_path": "app/services.py",
-        "How_is_it_connected_to_implementation": "Service function that performs the actual deletion of the user from the database. Called by the router's delete_user endpoint.",
-        "pseudo_code": "Fetch the user by user_id. If the user exists, delete the user from the database and commit the transaction. Return the deleted user object."
+        "type": "function",
+        "How_is_it_connected_to_implementation": "Service function called by the endpoint to delete the user from the database.",
+        "pseudo_code": "def delete_user(self, db: Session, user_id: int):\n    db_user = self.get_user(db, user_id)\n    if db_user:\n        db.delete(db_user)\n        db.commit()\n    return db_user"
       }
     ],
     "missing_implementations": [
