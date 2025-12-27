@@ -1,28 +1,6 @@
 {
   "add_new_user": {
-    "implementation": [
-      {
-        "name": "create_user",
-        "file_path": "app/routers/users.py",
-        "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint for POST /users/. Receives user data, checks for duplicate email, and delegates user creation to the service layer.",
-        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if the email is already registered\n    IF a user with the email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call UserService.create_user to add the user\n        Return the created user"
-      },
-      {
-        "name": "get_user_by_email",
-        "file_path": "app/services.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before creating a new user.",
-        "pseudo_code": "Query the User table for a user with the given email\nReturn the user if found, else return None"
-      },
-      {
-        "name": "create_user",
-        "file_path": "app/services.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Creates a new user in the database using the provided user data. Called by the endpoint after duplicate email check.",
-        "pseudo_code": "Create a new User model instance with email and name from the input\nAdd the user to the database session\nCommit the session to save the user\nRefresh and return the created user"
-      }
-    ],
+    "implementation": [],
     "missing_implementations": [
       "Username must not be duplicate",
       "Age must be in the range 0-150",
@@ -30,43 +8,13 @@
     ]
   },
   "update_email_address": {
-    "implementation": [
-      {
-        "name": "update_user",
-        "file_path": "app/routers/users.py",
-        "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint that handles HTTP PUT requests to update a user's information, including their email address. It delegates the update logic to the service layer.",
-        "pseudo_code": "When a PUT request is made to /users/{user_id} with new user data:\n    Call services.user_service.update_user with db, user_id, and user\n    If the returned db_user is None:\n        Raise HTTP 404 (User not found)\n    Return the updated user"
-      },
-      {
-        "name": "UserService.update_user",
-        "file_path": "app/services.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Service function called by the endpoint to perform the actual update of the user's email and name in the database.",
-        "pseudo_code": "Given db, user_id, and user:\n    Retrieve db_user by user_id\n    If db_user exists:\n        Set db_user.email to user.email\n        Set db_user.name to user.name\n        Commit changes to the database\n        Refresh db_user from the database\n    Return db_user"
-      }
-    ],
+    "implementation": [],
     "missing_implementations": [
       "Do not update if the previous email is the same as the updated one"
     ]
   },
   "deactivate_user_account": {
-    "implementation": [
-      {
-        "name": "delete_user",
-        "file_path": "app/routers/users.py",
-        "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint that handles HTTP DELETE requests to remove a user by user_id. It calls the service layer to perform the deletion.",
-        "pseudo_code": "When a DELETE request is made to /users/{user_id}:\n    Call services.user_service.delete_user(db, user_id)\n    If no user is found:\n        Raise HTTP 404 error\n    Return the deleted user object"
-      },
-      {
-        "name": "UserService.delete_user",
-        "file_path": "app/services.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Service function that deletes the user from the database if found. Called by the delete_user endpoint.",
-        "pseudo_code": "Given db and user_id:\n    Retrieve user by user_id\n    If user exists:\n        Delete user from database\n        Commit transaction\n    Return the deleted user object (or None if not found)"
-      }
-    ],
+    "implementation": [],
     "missing_implementations": [
       "Send email of deactivation to the email address"
     ]
@@ -74,7 +22,7 @@
   "calculate_average_age": {
     "implementation": [],
     "missing_implementations": [
-      "Calculate average age of active users"
+      "Only active users are considered"
     ]
   },
   "categorize_user_into_age": {
