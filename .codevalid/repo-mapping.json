@@ -2,50 +2,34 @@
   "add_new_user": {
     "implementation": [
       {
-        "id": "endpoint_create_user_post_/users/",
+        "id": "endpoint_create_user_post_/users_",
         "name": "create_user",
         "file_path": "app/routers/users.py",
         "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint that handles POST requests to add a new user. It checks for duplicate email and delegates user creation to the service layer.",
-        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if the email is already registered\n    IF user with email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call create_user in the service layer to add the user\n        Return the created user"
+        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and delegates user creation to the service layer.",
+        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if the email is already registered\n    IF a user with the email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call create_user in the service layer to add the user\n    Return the created user"
       },
       {
         "id": "service_get_user_by_email",
         "name": "get_user_by_email",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to prevent duplicate emails.",
-        "pseudo_code": "Query the User table for a user with the given email\nReturn the user if found, else return None"
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before adding a new user.",
+        "pseudo_code": "Query the User table for a record with the given email\nReturn the user if found, else return None"
       },
       {
         "id": "service_create_user",
         "name": "create_user",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Creates a new user in the database with the provided email and name.",
-        "pseudo_code": "Create a new User model instance with email and name from input\nAdd the user to the database session\nCommit the session to save the user\nRefresh and return the new user"
-      },
-      {
-        "id": "model_user",
-        "name": "User",
-        "file_path": "app/models.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Database model representing the user. Defines the schema for storing user data, including unique email constraint.",
-        "pseudo_code": "Define a User table with columns:\n    id (primary key)\n    email (unique, indexed)\n    name"
-      },
-      {
-        "id": "schema_usercreate",
-        "name": "UserCreate",
-        "file_path": "app/schemas.py",
-        "type": "function",
-        "How_is_it_connected_to_implementation": "Pydantic schema for validating incoming user creation data.",
-        "pseudo_code": "Inherit from UserBase\nRequire fields:\n    email (str)\n    name (str)"
+        "How_is_it_connected_to_implementation": "Handles the actual creation of the user in the database. Called by the endpoint after validation.",
+        "pseudo_code": "Create a new User model instance with email and name from the input\nAdd the user to the database session\nCommit the session\nRefresh and return the new user"
       }
     ],
     "missing_implementations": [
-      "Username must not be duplicate (only email is checked for duplicates, not username)",
-      "Add new users with age and work_role (age and work_role fields are missing in schema and model)",
-      "Age must be in the range 0-150 (no age field or validation present)"
+      "Username must not be duplicate (the code checks for duplicate email, not username)",
+      "Age must be in the range 0-150",
+      "If work_role is not provided, default to 'developer'"
     ]
   },
   "update_email_address": {
