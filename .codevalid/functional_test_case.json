@@ -10,7 +10,7 @@
           "type": "positive",
           "test_setup": {
             "given": "A user with email 'test@example.com' exists in the User table.",
-            "when": "get_user_by_email('test@example.com') is called.",
+            "when": "get_user_by_email('test@example.com') is called",
             "then": "The function returns the user object corresponding to 'test@example.com'."
           },
           "implementation_id": "service_get_user_by_email"
@@ -22,7 +22,7 @@
           "type": "negative",
           "test_setup": {
             "given": "No user with email 'nouser@example.com' exists in the User table.",
-            "when": "get_user_by_email('nouser@example.com') is called.",
+            "when": "get_user_by_email('nouser@example.com') is called",
             "then": "The function returns None."
           },
           "implementation_id": "service_get_user_by_email"
@@ -30,12 +30,12 @@
         {
           "id": "get_user_by_email_case_sensitivity",
           "name": "test_email_case_sensitivity",
-          "description": "Should handle case sensitivity according to database collation (e.g., treat 'Test@Example.com' and 'test@example.com' as the same or different based on implementation).",
+          "description": "Should handle case sensitivity according to database collation (e.g., treat 'Test@Example.com' and 'test@example.com' as the same or different based on configuration).",
           "type": "edge",
           "test_setup": {
             "given": "A user with email 'test@example.com' exists in the User table.",
-            "when": "get_user_by_email('Test@Example.com') is called.",
-            "then": "The function returns the user object if the lookup is case-insensitive, else returns None."
+            "when": "get_user_by_email('Test@Example.com') is called",
+            "then": "The function returns the user object if the lookup is case-insensitive, or None if case-sensitive."
           },
           "implementation_id": "service_get_user_by_email"
         },
@@ -45,9 +45,9 @@
           "description": "Should return None or raise an error when an empty string is provided as the email.",
           "type": "negative",
           "test_setup": {
-            "given": "The User table may or may not contain users.",
-            "when": "get_user_by_email('') is called.",
-            "then": "The function returns None or raises a ValueError/appropriate exception."
+            "given": "The User table may or may not contain users with empty email fields (should not in a well-formed schema).",
+            "when": "get_user_by_email('') is called",
+            "then": "The function returns None or raises a validation/database error."
           },
           "implementation_id": "service_get_user_by_email"
         },
@@ -57,69 +57,57 @@
           "description": "Should return None or raise an error when an invalid email format is provided.",
           "type": "negative",
           "test_setup": {
-            "given": "The User table may or may not contain users.",
-            "when": "get_user_by_email('not-an-email') is called.",
-            "then": "The function returns None or raises a ValueError/appropriate exception."
+            "given": "No user with email 'invalid-email' exists in the User table.",
+            "when": "get_user_by_email('invalid-email') is called",
+            "then": "The function returns None or raises a validation/database error."
+          },
+          "implementation_id": "service_get_user_by_email"
+        },
+        {
+          "id": "get_user_by_email_null_email",
+          "name": "test_null_email",
+          "description": "Should raise an error when None is provided as the email parameter.",
+          "type": "negative",
+          "test_setup": {
+            "given": "The function is called with None as the email parameter.",
+            "when": "get_user_by_email(None) is called",
+            "then": "The function raises a TypeError or returns None, depending on implementation."
           },
           "implementation_id": "service_get_user_by_email"
         },
         {
           "id": "get_user_by_email_multiple_users_same_email",
           "name": "test_multiple_users_same_email",
-          "description": "Should return the first user found if multiple users with the same email exist (data integrity issue).",
+          "description": "Should return the first user found if multiple users with the same email exist (should not happen if unique constraint is enforced).",
           "type": "edge",
           "test_setup": {
-            "given": "Multiple users with email 'duplicate@example.com' exist in the User table due to data corruption.",
-            "when": "get_user_by_email('duplicate@example.com') is called.",
-            "then": "The function returns one of the user objects with that email (typically the first found)."
-          },
-          "implementation_id": "service_get_user_by_email"
-        },
-        {
-          "id": "get_user_by_email_null_email",
-          "name": "test_null_email_argument",
-          "description": "Should raise an error when None is provided as the email argument.",
-          "type": "negative",
-          "test_setup": {
-            "given": "The User table may or may not contain users.",
-            "when": "get_user_by_email(None) is called.",
-            "then": "The function raises a TypeError or appropriate exception."
+            "given": "Multiple users with email 'duplicate@example.com' exist in the User table due to data inconsistency.",
+            "when": "get_user_by_email('duplicate@example.com') is called",
+            "then": "The function returns one of the user objects with that email."
           },
           "implementation_id": "service_get_user_by_email"
         },
         {
           "id": "get_user_by_email_whitespace_email",
-          "name": "test_whitespace_email",
-          "description": "Should return None or raise an error when an email with only whitespace is provided.",
-          "type": "negative",
+          "name": "test_email_with_whitespace",
+          "description": "Should handle emails with leading/trailing whitespace appropriately.",
+          "type": "edge",
           "test_setup": {
-            "given": "The User table may or may not contain users.",
-            "when": "get_user_by_email('   ') is called.",
-            "then": "The function returns None or raises a ValueError/appropriate exception."
+            "given": "A user with email 'whitespace@example.com' exists in the User table.",
+            "when": "get_user_by_email('  whitespace@example.com  ') is called",
+            "then": "The function returns the user object if whitespace is trimmed, or None if not."
           },
           "implementation_id": "service_get_user_by_email"
         },
         {
           "id": "get_user_by_email_special_characters",
           "name": "test_email_with_special_characters",
-          "description": "Should correctly handle emails with special characters.",
-          "type": "edge",
+          "description": "Should correctly handle emails containing special characters.",
+          "type": "positive",
           "test_setup": {
-            "given": "A user with email 'user+test@example.com' exists in the User table.",
-            "when": "get_user_by_email('user+test@example.com') is called.",
-            "then": "The function returns the user object corresponding to 'user+test@example.com'."
-          },
-          "implementation_id": "service_get_user_by_email"
-        },
-        {
-          "id": "get_user_by_email_database_error",
-          "name": "test_database_error_handling",
-          "description": "Should handle database errors gracefully (e.g., connection failure).",
-          "type": "negative",
-          "test_setup": {
-            "given": "The database connection is unavailable or raises an exception.",
-            "when": "get_user_by_email('any@example.com') is called.",
-            "then": "The function raises a database exception or handles the error as per implementation."
+            "given": "A user with email 'user+tag@example.com' exists in the User table.",
+            "when": "get_user_by_email('user+tag@example.com') is called",
+            "then": "The function returns the user object corresponding to 'user+tag@example.com'."
           },
           "implementation_id": "service_get_user_by_email"
         }
@@ -129,182 +117,194 @@
       "implementation_id": "service_create_user",
       "test_cases": [
         {
-          "id": "create_user_valid_input",
-          "name": "test_create_user_with_valid_input",
-          "description": "Should create a new user when provided with valid email, name, age, and work_role.",
+          "id": "add_user_successful_creation",
+          "name": "test_create_user_success",
+          "description": "Successfully creates a new user with valid username, email, age, and work_role.",
           "type": "positive",
           "test_setup": {
-            "given": "A unique email, valid name, valid age, and valid work_role.",
+            "given": "A valid username, unique email, valid age, and valid work_role.",
             "when": "create_user is called with these parameters.",
-            "then": "A new user is created in the database and returned with the correct attributes."
+            "then": "A new user is added to the database and returned with correct attributes."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_duplicate_email",
-          "name": "test_create_user_with_duplicate_email",
-          "description": "Should fail to create a user if the email already exists in the database.",
+          "id": "add_user_duplicate_email",
+          "name": "test_create_user_duplicate_email",
+          "description": "Fails to create a user when the email already exists in the database.",
           "type": "negative",
           "test_setup": {
             "given": "An email that already exists in the database.",
             "when": "create_user is called with this duplicate email.",
-            "then": "An error is raised or the operation fails due to unique constraint violation."
+            "then": "An integrity error or exception is raised, and no new user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_missing_email",
-          "name": "test_create_user_with_missing_email",
-          "description": "Should fail to create a user if the email is missing.",
+          "id": "add_user_missing_username",
+          "name": "test_create_user_missing_username",
+          "description": "Fails to create a user when the username is missing.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid name, age, and work_role, but email is None or empty.",
+            "given": "A valid email, age, and work_role, but username is missing or None.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating that email is required."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_invalid_email_format",
-          "name": "test_create_user_with_invalid_email_format",
-          "description": "Should fail to create a user if the email format is invalid.",
+          "id": "add_user_missing_email",
+          "name": "test_create_user_missing_email",
+          "description": "Fails to create a user when the email is missing.",
           "type": "negative",
           "test_setup": {
-            "given": "A string that is not a valid email format.",
+            "given": "A valid username, age, and work_role, but email is missing or None.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating invalid email format."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_missing_name",
-          "name": "test_create_user_with_missing_name",
-          "description": "Should fail to create a user if the name is missing.",
+          "id": "add_user_invalid_email_format",
+          "name": "test_create_user_invalid_email_format",
+          "description": "Fails to create a user when the email format is invalid.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, age, and work_role, but name is None or empty.",
+            "given": "A username, age, work_role, and an invalid email format (e.g., 'user@').",
             "when": "create_user is called.",
-            "then": "An error is raised indicating that name is required."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_minimum_age",
-          "name": "test_create_user_with_minimum_age",
-          "description": "Should create a user with the minimum allowed age.",
+          "id": "add_user_minimum_age_boundary",
+          "name": "test_create_user_minimum_age",
+          "description": "Creates a user with the minimum allowed age.",
           "type": "positive",
           "test_setup": {
-            "given": "A valid email, name, work_role, and the minimum allowed age (e.g., 0 or 18 depending on requirements).",
+            "given": "A valid username, email, work_role, and the minimum allowed age (e.g., 0 or 18 depending on requirements).",
             "when": "create_user is called.",
-            "then": "A new user is created with the minimum age."
+            "then": "A new user is created if the age is valid per requirements."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_maximum_age",
-          "name": "test_create_user_with_maximum_age",
-          "description": "Should create a user with the maximum allowed age.",
+          "id": "add_user_maximum_age_boundary",
+          "name": "test_create_user_maximum_age",
+          "description": "Creates a user with the maximum allowed age.",
           "type": "positive",
           "test_setup": {
-            "given": "A valid email, name, work_role, and the maximum allowed age (e.g., 120).",
+            "given": "A valid username, email, work_role, and the maximum allowed age (e.g., 120).",
             "when": "create_user is called.",
-            "then": "A new user is created with the maximum age."
+            "then": "A new user is created if the age is valid per requirements."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_age_below_minimum",
-          "name": "test_create_user_with_age_below_minimum",
-          "description": "Should fail to create a user if age is below the minimum allowed.",
+          "id": "add_user_age_below_minimum",
+          "name": "test_create_user_age_below_minimum",
+          "description": "Fails to create a user when age is below the minimum allowed.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, work_role, and an age below the minimum allowed.",
+            "given": "A valid username, email, work_role, and an age below the minimum allowed.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating age is out of bounds."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_age_above_maximum",
-          "name": "test_create_user_with_age_above_maximum",
-          "description": "Should fail to create a user if age is above the maximum allowed.",
+          "id": "add_user_age_above_maximum",
+          "name": "test_create_user_age_above_maximum",
+          "description": "Fails to create a user when age is above the maximum allowed.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, work_role, and an age above the maximum allowed.",
+            "given": "A valid username, email, work_role, and an age above the maximum allowed.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating age is out of bounds."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_missing_age",
-          "name": "test_create_user_with_missing_age",
-          "description": "Should fail to create a user if age is missing.",
+          "id": "add_user_missing_work_role",
+          "name": "test_create_user_missing_work_role",
+          "description": "Fails to create a user when work_role is missing.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, work_role, but age is None.",
+            "given": "A valid username, email, age, but work_role is missing or None.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating age is required."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_missing_work_role",
-          "name": "test_create_user_with_missing_work_role",
-          "description": "Should fail to create a user if work_role is missing.",
+          "id": "add_user_empty_username",
+          "name": "test_create_user_empty_username",
+          "description": "Fails to create a user when username is an empty string.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, age, but work_role is None or empty.",
+            "given": "An empty string for username, valid email, age, and work_role.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating work_role is required."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_invalid_age_type",
-          "name": "test_create_user_with_invalid_age_type",
-          "description": "Should fail to create a user if age is not an integer.",
+          "id": "add_user_empty_email",
+          "name": "test_create_user_empty_email",
+          "description": "Fails to create a user when email is an empty string.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, work_role, and age as a string or float.",
+            "given": "A valid username, empty string for email, age, and work_role.",
             "when": "create_user is called.",
-            "then": "An error is raised indicating age must be an integer."
+            "then": "A validation error or exception is raised, and no user is created."
           },
           "implementation_id": "service_create_user"
         },
         {
-          "id": "create_user_long_name",
-          "name": "test_create_user_with_long_name",
-          "description": "Should handle creation of a user with a very long name (boundary test).",
-          "type": "positive",
-          "test_setup": {
-            "given": "A valid email, age, work_role, and a name at the maximum allowed length.",
-            "when": "create_user is called.",
-            "then": "A new user is created with the long name, or an error is raised if it exceeds the limit."
-          },
-          "implementation_id": "service_create_user"
-        },
-        {
-          "id": "create_user_special_characters_in_name",
-          "name": "test_create_user_with_special_characters_in_name",
-          "description": "Should handle creation of a user with special characters in the name.",
-          "type": "positive",
-          "test_setup": {
-            "given": "A valid email, age, work_role, and a name containing special characters.",
-            "when": "create_user is called.",
-            "then": "A new user is created with the special characters in the name."
-          },
-          "implementation_id": "service_create_user"
-        },
-        {
-          "id": "create_user_database_failure",
-          "name": "test_create_user_database_failure",
-          "description": "Should handle database errors gracefully (e.g., commit failure).",
+          "id": "add_user_empty_work_role",
+          "name": "test_create_user_empty_work_role",
+          "description": "Fails to create a user when work_role is an empty string.",
           "type": "negative",
           "test_setup": {
-            "given": "A valid email, name, age, work_role, but the database session commit fails (simulate DB error).",
+            "given": "A valid username, email, age, and empty string for work_role.",
             "when": "create_user is called.",
-            "then": "An exception is raised or an error is returned indicating database failure."
+            "then": "A validation error or exception is raised, and no user is created."
+          },
+          "implementation_id": "service_create_user"
+        },
+        {
+          "id": "add_user_null_age",
+          "name": "test_create_user_null_age",
+          "description": "Fails to create a user when age is None.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A valid username, email, work_role, and age is None.",
+            "when": "create_user is called.",
+            "then": "A validation error or exception is raised, and no user is created."
+          },
+          "implementation_id": "service_create_user"
+        },
+        {
+          "id": "add_user_database_commit_failure",
+          "name": "test_create_user_database_commit_failure",
+          "description": "Handles database commit failure gracefully.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A valid user input, but the database session commit fails (e.g., due to DB connection loss).",
+            "when": "create_user is called.",
+            "then": "An exception is raised, and no user is created."
+          },
+          "implementation_id": "service_create_user"
+        },
+        {
+          "id": "add_user_refresh_failure",
+          "name": "test_create_user_refresh_failure",
+          "description": "Handles failure during the refresh step after commit.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A valid user input, commit succeeds, but refresh fails (e.g., due to DB error).",
+            "when": "create_user is called.",
+            "then": "An exception is raised, and the user is not returned."
           },
           "implementation_id": "service_create_user"
         }
@@ -813,6 +813,191 @@
             "then": "HTTP 422 error is returned indicating all required fields are missing"
           },
           "implementation_id": "endpoint_create_user_post_/users/"
+        }
+      ]
+    },
+    {
+      "implementation_id": "endpoint_create_user_post_/users_",
+      "test_cases": [
+        {
+          "id": "add_user_success",
+          "name": "Add user successfully",
+          "description": "Verify that a new user can be added with valid username, email, age, and work_role.",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"john_doe\", \"email\": \"john@example.com\", \"age\": 30, \"work_role\": \"developer\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"john_doe\", \"email\": \"john@example.com\", \"age\": 30, \"work_role\": \"developer\", \"id\": 1}",
+          "test_setup": {
+            "given": "No user exists with email 'john@example.com'",
+            "when": "A POST request is made to /users/ with valid user data",
+            "then": "A new user is created and returned with status 201"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "duplicate_email",
+          "name": "Fail to add user with duplicate email",
+          "description": "Verify that adding a user with an email already registered returns HTTP 400.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"jane_doe\", \"email\": \"john@example.com\", \"age\": 25, \"work_role\": \"designer\"}",
+          "response_status_code": 400,
+          "response_body_json": "{\"detail\": \"Email already registered\"}",
+          "test_setup": {
+            "given": "A user already exists with email 'john@example.com'",
+            "when": "A POST request is made to /users/ with the same email",
+            "then": "The API returns HTTP 400 with error message 'Email already registered'"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "missing_username",
+          "name": "Fail to add user with missing username",
+          "description": "Verify that missing the username field returns HTTP 422 (Unprocessable Entity).",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"email\": \"unique@example.com\", \"age\": 22, \"work_role\": \"tester\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Field 'username' is required\"}",
+          "test_setup": {
+            "given": "No user exists with email 'unique@example.com'",
+            "when": "A POST request is made to /users/ without the username field",
+            "then": "The API returns HTTP 422 with a validation error"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "invalid_email_format",
+          "name": "Fail to add user with invalid email format",
+          "description": "Verify that an invalid email format returns HTTP 422 (Unprocessable Entity).",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"invalid_email\", \"email\": \"not-an-email\", \"age\": 28, \"work_role\": \"manager\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Invalid email format\"}",
+          "test_setup": {
+            "given": "No user exists with email 'not-an-email'",
+            "when": "A POST request is made to /users/ with an invalid email format",
+            "then": "The API returns HTTP 422 with a validation error"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "age_boundary_min",
+          "name": "Add user with minimum valid age",
+          "description": "Verify that a user can be added with the minimum valid age (e.g., 0 if allowed).",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"baby_user\", \"email\": \"baby@example.com\", \"age\": 0, \"work_role\": \"intern\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"baby_user\", \"email\": \"baby@example.com\", \"age\": 0, \"work_role\": \"intern\", \"id\": 2}",
+          "test_setup": {
+            "given": "No user exists with email 'baby@example.com'",
+            "when": "A POST request is made to /users/ with age 0",
+            "then": "A new user is created and returned with status 201"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "age_negative",
+          "name": "Fail to add user with negative age",
+          "description": "Verify that a negative age returns HTTP 422 (Unprocessable Entity).",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"neg_age\", \"email\": \"neg@example.com\", \"age\": -1, \"work_role\": \"tester\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Age must be a non-negative integer\"}",
+          "test_setup": {
+            "given": "No user exists with email 'neg@example.com'",
+            "when": "A POST request is made to /users/ with age -1",
+            "then": "The API returns HTTP 422 with a validation error"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "missing_work_role",
+          "name": "Fail to add user with missing work_role",
+          "description": "Verify that missing the work_role field returns HTTP 422 (Unprocessable Entity).",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"no_role\", \"email\": \"norole@example.com\", \"age\": 27}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Field 'work_role' is required\"}",
+          "test_setup": {
+            "given": "No user exists with email 'norole@example.com'",
+            "when": "A POST request is made to /users/ without the work_role field",
+            "then": "The API returns HTTP 422 with a validation error"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "empty_username",
+          "name": "Fail to add user with empty username",
+          "description": "Verify that an empty username returns HTTP 422 (Unprocessable Entity).",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"\", \"email\": \"emptyuser@example.com\", \"age\": 20, \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Username cannot be empty\"}",
+          "test_setup": {
+            "given": "No user exists with email 'emptyuser@example.com'",
+            "when": "A POST request is made to /users/ with an empty username",
+            "then": "The API returns HTTP 422 with a validation error"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
+        },
+        {
+          "id": "extra_field_ignored",
+          "name": "Add user with extra field in request",
+          "description": "Verify that extra fields in the request body are ignored and do not affect user creation.",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"extra_field\", \"email\": \"extra@example.com\", \"age\": 33, \"work_role\": \"admin\", \"extra\": \"ignore_me\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"extra_field\", \"email\": \"extra@example.com\", \"age\": 33, \"work_role\": \"admin\", \"id\": 3}",
+          "test_setup": {
+            "given": "No user exists with email 'extra@example.com'",
+            "when": "A POST request is made to /users/ with an extra field",
+            "then": "A new user is created and the extra field is ignored in the response"
+          },
+          "implementation_id": "endpoint_create_user_post_/users_"
         }
       ]
     }
