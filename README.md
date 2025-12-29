@@ -15,6 +15,6 @@ An application that manages user accounts and provides statistical analysis.
 - Prevent duplicate usernames 
 - Validate age range (0-150)    
    
- 
+  
   
  
