@@ -607,6 +607,328 @@
           "implementation_id": "schema_usercreate"
         }
       ]
+    },
+    {
+      "implementation_id": "function_get_user_by_email_service",
+      "test_cases": [
+        {
+          "id": "get_user_by_email_existing_user",
+          "name": "test_existing_user_by_email",
+          "description": "Should return the user object when a user with the given email exists in the database.",
+          "type": "positive",
+          "test_setup": {
+            "given": "A user with email 'test@example.com' exists in the User table.",
+            "when": "get_user_by_email('test@example.com') is called.",
+            "then": "The function returns the user object corresponding to 'test@example.com'."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_nonexistent_user",
+          "name": "test_nonexistent_user_by_email",
+          "description": "Should return None when no user with the given email exists in the database.",
+          "type": "negative",
+          "test_setup": {
+            "given": "No user with email 'nouser@example.com' exists in the User table.",
+            "when": "get_user_by_email('nouser@example.com') is called.",
+            "then": "The function returns None."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_case_sensitivity",
+          "name": "test_email_case_sensitivity",
+          "description": "Should handle case sensitivity according to database collation (e.g., treat 'Test@Example.com' and 'test@example.com' as the same or different based on configuration).",
+          "type": "edge",
+          "test_setup": {
+            "given": "A user with email 'test@example.com' exists in the User table.",
+            "when": "get_user_by_email('Test@Example.com') is called.",
+            "then": "The function returns the user object if the lookup is case-insensitive, or None if case-sensitive."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_empty_string",
+          "name": "test_empty_email_string",
+          "description": "Should return None or raise an appropriate error when an empty string is provided as the email.",
+          "type": "negative",
+          "test_setup": {
+            "given": "The User table may contain users, but none with an empty email.",
+            "when": "get_user_by_email('') is called.",
+            "then": "The function returns None or raises a ValueError/appropriate exception."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_invalid_email_format",
+          "name": "test_invalid_email_format",
+          "description": "Should return None or raise an appropriate error when an invalid email format is provided.",
+          "type": "negative",
+          "test_setup": {
+            "given": "The User table may contain users, but none with email 'invalid-email'.",
+            "when": "get_user_by_email('invalid-email') is called.",
+            "then": "The function returns None or raises a ValueError/appropriate exception."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_multiple_users_same_email",
+          "name": "test_multiple_users_same_email",
+          "description": "Should return the first user found if multiple users with the same email exist (should not happen if unique constraint is enforced).",
+          "type": "edge",
+          "test_setup": {
+            "given": "Multiple users with email 'duplicate@example.com' exist in the User table due to data inconsistency.",
+            "when": "get_user_by_email('duplicate@example.com') is called.",
+            "then": "The function returns one of the user objects with that email."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_null_email",
+          "name": "test_null_email_argument",
+          "description": "Should raise an appropriate error when None is provided as the email argument.",
+          "type": "negative",
+          "test_setup": {
+            "given": "The User table may contain users, but None is not a valid email.",
+            "when": "get_user_by_email(None) is called.",
+            "then": "The function raises a TypeError or appropriate exception."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_whitespace_email",
+          "name": "test_whitespace_email",
+          "description": "Should return None or raise an appropriate error when an email with only whitespace is provided.",
+          "type": "negative",
+          "test_setup": {
+            "given": "The User table may contain users, but none with email consisting only of whitespace.",
+            "when": "get_user_by_email('   ') is called.",
+            "then": "The function returns None or raises a ValueError/appropriate exception."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_special_characters",
+          "name": "test_email_with_special_characters",
+          "description": "Should correctly handle emails with special characters if they are valid according to the application's email validation rules.",
+          "type": "edge",
+          "test_setup": {
+            "given": "A user with email 'user+tag@example.com' exists in the User table.",
+            "when": "get_user_by_email('user+tag@example.com') is called.",
+            "then": "The function returns the user object corresponding to 'user+tag@example.com'."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        },
+        {
+          "id": "get_user_by_email_database_error",
+          "name": "test_database_error_handling",
+          "description": "Should handle database errors gracefully (e.g., connection issues, query failures).",
+          "type": "negative",
+          "test_setup": {
+            "given": "The database connection is unavailable or a query error occurs.",
+            "when": "get_user_by_email('any@example.com') is called.",
+            "then": "The function raises a database exception or handles the error as per application policy."
+          },
+          "implementation_id": "function_get_user_by_email_service"
+        }
+      ]
+    },
+    {
+      "implementation_id": "function_create_user_service",
+      "test_cases": [
+        {
+          "id": "create_user_valid_input",
+          "name": "test_create_user_with_valid_input",
+          "description": "Should create a new user when provided with valid username, email, age, and work_role.",
+          "type": "positive",
+          "test_setup": {
+            "given": "A valid user data dictionary with unique email, valid username, age within allowed range, and valid work_role.",
+            "when": "create_user is called with this data.",
+            "then": "A new user is created in the database and returned with correct attributes."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_missing_email",
+          "name": "test_create_user_missing_email",
+          "description": "Should fail when email is missing from input.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary missing the email field.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating email is required."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_invalid_email_format",
+          "name": "test_create_user_invalid_email_format",
+          "description": "Should fail when email format is invalid.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with an invalid email format (e.g., 'useratexample.com').",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating invalid email format."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_missing_username",
+          "name": "test_create_user_missing_username",
+          "description": "Should fail when username is missing from input.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary missing the username field.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating username is required."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_minimum_age",
+          "name": "test_create_user_with_minimum_age",
+          "description": "Should create a user when age is at the minimum allowed value.",
+          "type": "positive",
+          "test_setup": {
+            "given": "A user data dictionary with age set to the minimum allowed (e.g., 0 or 18 depending on requirements).",
+            "when": "create_user is called with this data.",
+            "then": "A new user is created and returned with the correct age."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_maximum_age",
+          "name": "test_create_user_with_maximum_age",
+          "description": "Should create a user when age is at the maximum allowed value.",
+          "type": "positive",
+          "test_setup": {
+            "given": "A user data dictionary with age set to the maximum allowed (e.g., 120).",
+            "when": "create_user is called with this data.",
+            "then": "A new user is created and returned with the correct age."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_age_below_minimum",
+          "name": "test_create_user_with_age_below_minimum",
+          "description": "Should fail when age is below the minimum allowed value.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with age below the minimum allowed (e.g., -1 or 17).",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating age is out of bounds."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_age_above_maximum",
+          "name": "test_create_user_with_age_above_maximum",
+          "description": "Should fail when age is above the maximum allowed value.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with age above the maximum allowed (e.g., 121).",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating age is out of bounds."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_missing_work_role",
+          "name": "test_create_user_missing_work_role",
+          "description": "Should fail when work_role is missing from input.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary missing the work_role field.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating work_role is required."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_empty_username",
+          "name": "test_create_user_with_empty_username",
+          "description": "Should fail when username is an empty string.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with username as an empty string.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating username cannot be empty."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_empty_email",
+          "name": "test_create_user_with_empty_email",
+          "description": "Should fail when email is an empty string.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with email as an empty string.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating email cannot be empty."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_empty_work_role",
+          "name": "test_create_user_with_empty_work_role",
+          "description": "Should fail when work_role is an empty string.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with work_role as an empty string.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating work_role cannot be empty."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_null_fields",
+          "name": "test_create_user_with_null_fields",
+          "description": "Should fail when any required field is null.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with one or more required fields set to null.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating required fields cannot be null."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_database_failure",
+          "name": "test_create_user_database_failure",
+          "description": "Should handle database commit failure gracefully.",
+          "type": "negative",
+          "test_setup": {
+            "given": "A valid user data dictionary and a simulated database failure during commit.",
+            "when": "create_user is called and the database commit fails.",
+            "then": "An exception is raised or an error is returned indicating database failure, and no user is created."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_duplicate_email",
+          "name": "test_create_user_with_duplicate_email",
+          "description": "Should fail when trying to create a user with an email that already exists (if duplicate check is not handled elsewhere).",
+          "type": "negative",
+          "test_setup": {
+            "given": "A user data dictionary with an email that already exists in the database.",
+            "when": "create_user is called with this data.",
+            "then": "An exception is raised or an error is returned indicating duplicate email."
+          },
+          "implementation_id": "function_create_user_service"
+        },
+        {
+          "id": "create_user_extra_fields",
+          "name": "test_create_user_with_extra_fields",
+          "description": "Should ignore extra fields not defined in the user model.",
+          "type": "positive",
+          "test_setup": {
+            "given": "A user data dictionary with all required fields and additional irrelevant fields.",
+            "when": "create_user is called with this data.",
+            "then": "A new user is created, extra fields are ignored, and only defined fields are stored."
+          },
+          "implementation_id": "function_create_user_service"
+        }
+      ]
     }
   ],
   "component": [],
@@ -998,6 +1320,211 @@
             "then": "A new user is created and the extra field is ignored in the response"
           },
           "implementation_id": "endpoint_create_user_post_/users_"
+        }
+      ]
+    },
+    {
+      "implementation_id": "endpoint_create_user_router_post_users",
+      "test_cases": [
+        {
+          "id": "create_user_valid",
+          "name": "Create user with valid data",
+          "description": "Successfully create a new user with all required fields and valid data.",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"john_doe\", \"email\": \"john@example.com\", \"age\": 30, \"work_role\": \"engineer\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"john_doe\", \"email\": \"john@example.com\", \"age\": 30, \"work_role\": \"engineer\", \"id\": 1}",
+          "test_setup": {
+            "given": "No user exists with email 'john@example.com'",
+            "when": "POST /users/ with valid user data",
+            "then": "User is created and returned with status 201"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_duplicate_email",
+          "name": "Fail to create user with duplicate email",
+          "description": "Attempt to create a user with an email that already exists should fail.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"jane_doe\", \"email\": \"john@example.com\", \"age\": 25, \"work_role\": \"designer\"}",
+          "response_status_code": 400,
+          "response_body_json": "{\"detail\": \"Email already registered\"}",
+          "test_setup": {
+            "given": "A user already exists with email 'john@example.com'",
+            "when": "POST /users/ with the same email",
+            "then": "API returns 400 with error message"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_missing_username",
+          "name": "Fail to create user with missing username",
+          "description": "Attempt to create a user without a username should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"email\": \"newuser@example.com\", \"age\": 22, \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Username is required\"}",
+          "test_setup": {
+            "given": "No user exists with email 'newuser@example.com'",
+            "when": "POST /users/ without username",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_missing_email",
+          "name": "Fail to create user with missing email",
+          "description": "Attempt to create a user without an email should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"no_email\", \"age\": 22, \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Email is required\"}",
+          "test_setup": {
+            "given": "No user exists with username 'no_email'",
+            "when": "POST /users/ without email",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_invalid_email_format",
+          "name": "Fail to create user with invalid email format",
+          "description": "Attempt to create a user with an invalid email format should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"bad_email\", \"email\": \"not-an-email\", \"age\": 22, \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Invalid email format\"}",
+          "test_setup": {
+            "given": "No user exists with username 'bad_email'",
+            "when": "POST /users/ with invalid email format",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_missing_age",
+          "name": "Fail to create user with missing age",
+          "description": "Attempt to create a user without age should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"no_age\", \"email\": \"noage@example.com\", \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Age is required\"}",
+          "test_setup": {
+            "given": "No user exists with email 'noage@example.com'",
+            "when": "POST /users/ without age",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_age_boundary",
+          "name": "Create user with minimum valid age",
+          "description": "Successfully create a user with the minimum allowed age (e.g., 0 or 1 depending on business rule).",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"baby_user\", \"email\": \"baby@example.com\", \"age\": 0, \"work_role\": \"infant\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"baby_user\", \"email\": \"baby@example.com\", \"age\": 0, \"work_role\": \"infant\", \"id\": 2}",
+          "test_setup": {
+            "given": "No user exists with email 'baby@example.com'",
+            "when": "POST /users/ with age 0",
+            "then": "User is created and returned with status 201"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_negative_age",
+          "name": "Fail to create user with negative age",
+          "description": "Attempt to create a user with a negative age should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"neg_age\", \"email\": \"neg@example.com\", \"age\": -1, \"work_role\": \"analyst\"}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Age must be a non-negative integer\"}",
+          "test_setup": {
+            "given": "No user exists with email 'neg@example.com'",
+            "when": "POST /users/ with negative age",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_missing_work_role",
+          "name": "Fail to create user with missing work_role",
+          "description": "Attempt to create a user without work_role should fail validation.",
+          "type": "negative",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"no_role\", \"email\": \"norole@example.com\", \"age\": 22}",
+          "response_status_code": 422,
+          "response_body_json": "{\"detail\": \"Work role is required\"}",
+          "test_setup": {
+            "given": "No user exists with email 'norole@example.com'",
+            "when": "POST /users/ without work_role",
+            "then": "API returns 422 with validation error"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
+        },
+        {
+          "id": "create_user_extra_fields",
+          "name": "Create user with extra fields in request",
+          "description": "Successfully create a user when extra, unexpected fields are present in the request body (should ignore extra fields).",
+          "type": "positive",
+          "request_method": "POST",
+          "request_url": "/users/",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "request_body_json": "{\"username\": \"extra_user\", \"email\": \"extra@example.com\", \"age\": 28, \"work_role\": \"tester\", \"extra_field\": \"ignore_me\"}",
+          "response_status_code": 201,
+          "response_body_json": "{\"username\": \"extra_user\", \"email\": \"extra@example.com\", \"age\": 28, \"work_role\": \"tester\", \"id\": 3}",
+          "test_setup": {
+            "given": "No user exists with email 'extra@example.com'",
+            "when": "POST /users/ with extra fields",
+            "then": "User is created and extra fields are ignored"
+          },
+          "implementation_id": "endpoint_create_user_router_post_users"
         }
       ]
     }
