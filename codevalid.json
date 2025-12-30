@@ -7,9 +7,10 @@
       "conditions": [
         "Username must not be duplicate",
         "Age must be in the range 0-150",
-        "If work_role is not provided, default to 'developer'"
+        "If work_role is not provided, default to 'developer'",
+        "If email ends with dev.io, set work_role to 'manager'"
       ],
-      "change_status": ""
+      "change_status": "updated"
     },
     {
       "id": "update_email_address",
@@ -50,6 +51,6 @@
       "change_status": ""
     }
   ],
-  "last_updated": "2025-12-29T01:01:52.941414",
+  "last_updated": "2025-12-30T15:23:32.091693",
   "version": "1.0"
 }
