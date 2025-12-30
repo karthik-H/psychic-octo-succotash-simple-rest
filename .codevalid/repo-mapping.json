@@ -6,30 +6,31 @@
         "name": "create_user",
         "file_path": "app/routers/users.py",
         "type": "endpoint",
-        "How_is_it_connected_to_implementation": "API endpoint that handles POST requests to /users/. It receives user data, checks for duplicate email, and delegates user creation to the service layer.",
-        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if email already exists\n    IF user with email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call create_user in UserService to add the user\n        Return the created user"
+        "How_is_it_connected_to_implementation": "API endpoint for adding a new user. Receives user data, checks for duplicate email, and delegates user creation to the service layer.",
+        "pseudo_code": "When a POST request is made to /users/ with user data:\n    Call get_user_by_email to check if the email is already registered\n    IF user with email exists:\n        Raise HTTP 400 error 'Email already registered'\n    ELSE:\n        Call create_user in the service layer to add the user\n        Return the created user"
       },
       {
-        "id": "function_get_user_by_email_service",
+        "id": "service_get_user_by_email",
         "name": "get_user_by_email",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique username/email condition.",
+        "How_is_it_connected_to_implementation": "Checks if a user with the given email already exists in the database. Used to enforce the unique email constraint before creating a new user.",
         "pseudo_code": "Query the User table for a user with the given email\nReturn the user if found, else return None"
       },
       {
-        "id": "function_create_user_service",
+        "id": "service_create_user",
         "name": "create_user",
         "file_path": "app/services.py",
         "type": "function",
-        "How_is_it_connected_to_implementation": "Creates a new user in the database using the provided user data. Called by the API endpoint after duplicate check.",
-        "pseudo_code": "Create a new User model instance with email and name from input\nAdd the user to the database session\nCommit the session\nRefresh and return the new user"
+        "How_is_it_connected_to_implementation": "Handles the actual creation of the user in the database. Called by the endpoint after validation.",
+        "pseudo_code": "Create a new User model instance with email and name from the input\nAdd the user to the database session\nCommit the session to save the user\nRefresh and return the new user"
       }
     ],
     "missing_implementations": [
-      "Username must not be duplicate (the code checks for duplicate email, not username)",
+      "Username must not be duplicate",
       "Age must be in the range 0-150",
-      "If work_role is not provided, default to 'developer'"
+      "If work_role is not provided, default to 'developer'",
+      "If email ends with dev.io, set work_role to 'manager'"
     ]
   },
   "update_email_address": {
