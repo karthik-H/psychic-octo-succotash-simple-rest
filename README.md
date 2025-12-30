@@ -7,6 +7,7 @@ An application that manages user accounts and provides statistical analysis.
 - Add new users with username, email, and age, work_role
 - Update user email addresses
 - default work_role should be developer
+- if email id ends with dev.io then set work_role to manager
 - don't update if the previous email is same as updated one
 - Deactivate user accounts
 - send email of deactivation to the email address
